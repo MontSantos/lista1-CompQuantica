@@ -3,7 +3,7 @@
 
 # Imports
 
-# In[252]:
+# In[30]:
 
 
 from qiskit import QuantumCircuit, transpile
@@ -16,7 +16,7 @@ import numpy as np
 # 
 # ### 1.1 Crie um circuito quântico de dois qubits (q0 e q1) que seja capaz de gerar o estado de Bell |ψ−⟩. Esse circuito servirá de base para construção dos 4 circuitos quânticos queserão utilizados em seguida:
 
-# In[253]:
+# In[31]:
 
 
 def create_circ():
@@ -31,7 +31,7 @@ def create_circ():
     return circ
 
 
-# In[254]:
+# In[32]:
 
 
 dummy = create_circ()
@@ -45,7 +45,7 @@ dummy.draw("mpl")
 
 # **A1B1** - Por \(A_1\) utilizar o Pauli \(Z\), não é necessário mudar a base, então aplica-se a identidade. Já \(B_1\), por utilizar $B_1 = \frac{1}{\sqrt{2}}(-Z-X)$, deve-se realizar uma rotação no eixo \(y\) de $\frac{3\pi}{4}$, utilizando o operador $R_y\left(\frac{3\pi}{4}\right)$.
 
-# In[255]:
+# In[33]:
 
 
 A1B1 = create_circ()
@@ -60,7 +60,7 @@ A1B1.draw("mpl")
 
 # **A1B2** - Como \(A_1\) utiliza o operador de Pauli \(Z\), não é necessário realizar uma mudança de base, sendo aplicada a identidade \(I\). Para $B_2 = \frac{1}{\sqrt{2}}(Z-X)$, deve-se realizar uma rotação em torno do eixo \(y\) de $\frac{\pi}{4}$, utilizando o operador $R_y\left(\frac{\pi}{4}\right)$.
 
-# In[256]:
+# In[34]:
 
 
 A1B2 = create_circ()
@@ -75,7 +75,7 @@ A1B2.draw("mpl")
 
 # **A2B1** - Como \(A_2\) utiliza o operador de Pauli \(X\), aplica-se a porta Hadamard \(H\) para realizar a mudança para a base de medição computacional. Para $B_1 = \frac{1}{\sqrt{2}}(-Z-X)$, deve-se realizar uma rotação em torno do eixo (y\) de $\frac{3\pi}{4}$, utilizando o operador $R_y\left(\frac{3\pi}{4}\right)$.
 
-# In[257]:
+# In[35]:
 
 
 A2B1 = create_circ()
@@ -90,7 +90,7 @@ A2B1.draw("mpl")
 
 # **A2B2** - Como \(A_2\) utiliza o operador de Pauli \(X\), aplica-se a porta Hadamard \(H\) para realizar a mudança para a base de medição computacional. Para $B_2 = \frac{1}{\sqrt{2}}(Z-X)$, deve-se realizar uma rotação em torno do eixo \(y\) de $\frac{\pi}{4}$, utilizando o operador $R_y\left(\frac{\pi}{4}\right)$.
 
-# In[258]:
+# In[36]:
 
 
 A2B2 = create_circ()
@@ -105,7 +105,7 @@ A2B2.draw("mpl")
 
 # ### 2.1 Utilizando o simulador do Qiskit, realize 10000 medidas em cada circuito. Para cada resultado obtido, obtenha o valor médio $\langle A_iB_j \rangle$. (Dica: observe que o Qiskit trata os resultados das medidas como $0$ e $1$, enquanto os observáveis definidos acima possuem resultados possíveis $+1$ e $-1$; não esqueça de levar isso em consideração.)
 
-# In[259]:
+# In[37]:
 
 
 sim = AerSimulator()
@@ -119,7 +119,7 @@ circs_transpile = transpile(circs, sim, seed_transpiler=SEED)
 res = sim.run(circs_transpile, shots=10000, seed_simulator=SEED).result()
 
 
-# In[260]:
+# In[38]:
 
 
 def calc_mean(res, index):
@@ -137,7 +137,7 @@ def calc_mean(res, index):
     return (val) / total
 
 
-# In[261]:
+# In[39]:
 
 
 mean_A1B1 = calc_mean(res, 0)
@@ -148,7 +148,7 @@ print(mean_A1B1, mean_A1B2, mean_A2B1, mean_A2B2)
 print(1/np.sqrt(2)) #Pode-se ver que o módulod e cada observável é próximo de 1/raiz 2, bom sinal para S
 
 
-# In[262]:
+# In[40]:
 
 
 print(res.get_counts(0))
@@ -157,7 +157,7 @@ print(res.get_counts(2))
 print(res.get_counts(3))
 
 
-# In[263]:
+# In[41]:
 
 
 means = [mean_A1B1, mean_A1B2, mean_A2B1, mean_A2B2]
@@ -176,15 +176,17 @@ plt.show()
 
 # ### 2.2 Calcule o valor de $S$ e verifique que ele é próximo do valor teórico $2\sqrt{2}$.
 
-# In[264]:
+# In[42]:
 
 
 S = mean_A1B1 - mean_A1B2 + mean_A2B1 + mean_A2B2
 
+S_teorico = 2 * np.sqrt(2)
+diferenca_percentual = abs(S - S_teorico) / S_teorico * 100
+
 print(f"S obtido: {S:.4f}")
-print(f"Valor teórico: {2 * np.sqrt(2):.4f}")
-print(100 - S/(2*np.sqrt(2))*100)
-print("De fato, S é próximo de 2√2.")
+print(f"Valor teórico: {S_teorico:.4f}")
+print(f"Diferença percentual: {diferenca_percentual:.4f}%")
 
 
 # ### Parte 3: Estados Separáveis 
@@ -192,7 +194,7 @@ print("De fato, S é próximo de 2√2.")
 
 # ### 3.1 Modifique os circuitos quânticos do item 1 de modo a refletir essa estratégia.
 
-# In[265]:
+# In[43]:
 
 
 def create_eva(state):
@@ -207,7 +209,7 @@ def create_eva(state):
     return circ
 
 
-# In[266]:
+# In[44]:
 
 
 A1B1_01 = create_eva("01")
@@ -219,7 +221,7 @@ A1B1_01.measure_all()
 A1B1_01.draw("mpl")
 
 
-# In[267]:
+# In[45]:
 
 
 A1B1_10 = create_eva("10")
@@ -231,7 +233,7 @@ A1B1_10.measure_all()
 A1B1_10.draw("mpl")
 
 
-# In[268]:
+# In[46]:
 
 
 A1B2_01 = create_eva("01")
@@ -244,7 +246,7 @@ A1B2_01.measure_all()
 A1B2_01.draw("mpl")
 
 
-# In[269]:
+# In[47]:
 
 
 A1B2_10 = create_eva("10")
@@ -257,7 +259,7 @@ A1B2_10.measure_all()
 A1B2_10.draw("mpl")
 
 
-# In[270]:
+# In[48]:
 
 
 A2B1_01 = create_eva("01")
@@ -270,7 +272,7 @@ A2B1_01.measure_all()
 A2B1_01.draw("mpl")
 
 
-# In[271]:
+# In[49]:
 
 
 A2B1_10 = create_eva("10")
@@ -283,7 +285,7 @@ A2B1_10.measure_all()
 A2B1_10.draw("mpl")
 
 
-# In[272]:
+# In[50]:
 
 
 A2B2_01 = create_eva("01")
@@ -296,7 +298,7 @@ A2B2_01.measure_all()
 A2B2_01.draw("mpl")
 
 
-# In[273]:
+# In[51]:
 
 
 A2B2_10 = create_eva("10")
@@ -311,19 +313,20 @@ A2B2_10.draw("mpl")
 
 # ### 3.2 Realize um número suficientemente grande de medidas e calcule o novo valor de $S$. O que você observa?
 
-# In[274]:
+# In[52]:
 
 
 sim_eva = AerSimulator()
+
 
 circs_eva = [A1B1_01, A1B1_10, A1B2_01, A1B2_10, A2B1_01, A2B1_10, A2B2_01, A2B2_10]
 
 circs_eva_transpile = transpile(circs_eva, sim_eva, seed_transpiler=SEED)
 
-res_eva = sim.run(circs_eva_transpile, shots=100000, seed_simulator=SEED).result()
+res_eva = sim_eva.run(circs_eva_transpile, shots=100000, seed_simulator=SEED).result()
 
 
-# In[ ]:
+# In[53]:
 
 
 mean_A1B1_01 = calc_mean(res_eva, 0)
@@ -339,7 +342,7 @@ mean_A2B2_01 = calc_mean(res_eva, 6)
 mean_A2B2_10 = calc_mean(res_eva, 7)
 
 
-# In[276]:
+# In[54]:
 
 
 print(res_eva.get_counts(0))
@@ -352,7 +355,7 @@ print(res_eva.get_counts(6))
 print(res_eva.get_counts(7))
 
 
-# In[277]:
+# In[55]:
 
 
 mean_A1B1_eva = (mean_A1B1_01 + mean_A1B1_10) / 2
@@ -363,7 +366,7 @@ mean_A2B2_eva = (mean_A2B2_01 + mean_A2B2_10) / 2
 print(mean_A1B1_eva, mean_A1B2_eva, mean_A2B1_eva, mean_A2B2_eva)
 
 
-# In[278]:
+# In[56]:
 
 
 means = [mean_A1B1_eva, mean_A1B2_eva, mean_A2B1_eva, mean_A2B2_eva]
@@ -380,16 +383,16 @@ plt.title("Valores médios dos observáveis")
 plt.show()
 
 
-# In[279]:
+# In[57]:
 
 
 S_eva = mean_A1B1_eva - mean_A1B2_eva + mean_A2B1_eva + mean_A2B2_eva
 
-print(f"<A1B1> = {mean_A1B1_eva:.4f}")
-print(f"<A1B2> = {mean_A1B2_eva:.4f}")
-print(f"<A2B1> = {mean_A2B1_eva:.4f}")
-print(f"<A2B2> = {mean_A2B2_eva:.4f}")
-print(f"S obtido com Eva: {S_eva:.4f}")
-print(f"Valor esperado para muitos shots: {np.sqrt(2):.4f}")
+print(f"<A1B1> = {mean_A1B1_eva:.5f}")
+print(f"<A1B2> = {mean_A1B2_eva:.5f}")
+print(f"<A2B1> = {mean_A2B1_eva:.5f}")
+print(f"<A2B2> = {mean_A2B2_eva:.5f}")
+print(f"S obtido com Eva: {S_eva:.5f}")
+print(f"Valor esperado para muitos shots: {np.sqrt(2):.5f}")
 print("Como |S| < 2, não há violação da desigualdade de Bell-CHSH.")
 
